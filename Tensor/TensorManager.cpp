@@ -91,14 +91,18 @@ void TensorManager::constructCalculationGraph2(u32 targetTensorNo, u32 tensor0No
 
 void TensorManager::mergeGraph(std::shared_ptr<TensorGraph> targetGraphPtr, std::shared_ptr<TensorGraph> sourceGraph)
 {
-	for (auto iter = (*sourceGraph).mGraph.begin(), end = (*sourceGraph).mGraph.end(); iter != end; iter++)
+	sourceGraph->sortGraph();
+	for (auto iter = (*sourceGraph).mSortedList.begin(), end = (*sourceGraph).mSortedList.end(); iter != end; iter++)
 	{
-		u32 instanceNo = iter->first;
-		std::vector<u32> targetInstanceNoTbl = iter->second;
+		u32 instanceNo = *iter;
 
-		
 		mTensorInfoTbl[instanceNo].mTensorGraph = targetGraphPtr;
-		(*targetGraphPtr).mGraph[instanceNo] = targetInstanceNoTbl; 
+
+		if (sourceGraph->mGraph.find(instanceNo) != sourceGraph->mGraph.end())
+		{
+			std::vector<u32> targetInstanceNoTbl = sourceGraph->mGraph[instanceNo];
+			(*targetGraphPtr).mGraph[instanceNo] = targetInstanceNoTbl;
+		}
 	}
 
 	for (auto iter = mTensorGraphTbl.begin(), end = mTensorGraphTbl.end(); iter != end; iter++)

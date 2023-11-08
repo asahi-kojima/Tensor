@@ -22,11 +22,6 @@ u32 Tensor::getComponentNum() const
 
 void Tensor::forward()
 {
-	//ここで計算グラフにアクセスして
-	//ループで後続全部のforwardを回す。
-	//for (;;)
-	//{
-	//}
 	const std::vector<u32>& sortedGraph = TensorManager::getInstance().getSortedGraph(mInstanceNo);
 	auto targetIter = std::find(sortedGraph.begin(), sortedGraph.end(), mInstanceNo);
 	if (targetIter == sortedGraph.end())
@@ -37,9 +32,16 @@ void Tensor::forward()
 	for (auto iter = targetIter, end = sortedGraph.end(); iter != end; iter++)
 	{
 		u32 instanceNo = *iter;
-		std::cout << instanceNo;
 		TensorManager::getInstance().forward(instanceNo);
 	}
+#if _DEBUG
+	for (auto iter = targetIter, end = sortedGraph.end(); iter != end; iter++)
+	{
+		u32 instanceNo = *iter;
+		std::cout << instanceNo << "->";
+	}
+	std::cout << "/" << std::endl;
+#endif
 
 	TensorManager::getInstance().forward(mInstanceNo);
 }

@@ -64,7 +64,7 @@ Tensor Tensor::operator + (const Tensor&)&&
 }
 
 
-Tensor Tensor::operator + (Tensor&&) const&
+Tensor Tensor::operator + (Tensor&& tensorR) const&
 {
 	return Tensor(1);
 }

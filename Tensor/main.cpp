@@ -16,8 +16,15 @@ void setValue(Tensor& tensor, f32 value)
 	}
 }
 
+Tensor func(Tensor& x, Tensor& y)
+{
+	Tensor z = x + y;
+	return z;
+}
+
 int main()
 {
+
 	TensorManager& manager = TensorManager::getInstance();
 	Tensor t0 = Tensor(2, 2, 4); setValue(t0, 1);
 	Tensor t1 = Tensor(2, 2, 4); setValue(t1, 2);
@@ -37,11 +44,20 @@ int main()
 	}
 
 	Tensor t10 = t3 + (t0 + t6);
-
+	Tensor t11 = func(t2, t5);
 
 	t0.forward();
 	t5.forward();
 	t2.backward();
+
+	//Tensor x0 = Tensor(1);
+	//Tensor x1 = Tensor(1);
+	//Tensor x2 = x0 + x1;
+	//Tensor x3 = x0 + x2;
+	//Tensor x4 = x0 + x3;
+	//Tensor x5 = x0 + x3;
+	//Tensor x6 = x4 + x5;
+	//x0.forward();
 }
 
 // プログラムの実行: Ctrl + F5 または [デバッグ] > [デバッグなしで開始] メニュー
