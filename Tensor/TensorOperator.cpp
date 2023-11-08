@@ -53,8 +53,9 @@ Tensor Tensor::operator + (const Tensor& tensorR) const&
 	//ƒOƒ‰ƒt‚Ì\’z
 	TensorManager::getInstance().constructCalculationGraph2(targetTensor.mInstanceNo, tensorL.mInstanceNo, tensorR.mInstanceNo);
 
-
-	TensorManager::getInstance().forward(targetTensor.mInstanceNo);
+	//–³‚­‚Ä‚à‚¢‚¢‚©‚à
+	//TensorManager::getInstance().forward(targetTensor.mInstanceNo);
+	
 	return targetTensor;
 }
 
