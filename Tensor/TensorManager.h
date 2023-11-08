@@ -120,7 +120,26 @@ public:
 		targetInfo.mChildTensorCoreTbl.push_back(tmpChildTensorCoreInfo);
 	}
 
+	void registPSForwardInfo(u32 instanceNo, u32 newRootInstanceNo,
+		std::function<void(std::shared_ptr<TensorCore>, std::vector<std::shared_ptr<TensorCore>>)> forwardRule)
+	{
+		TensorInformation& targetInfo = mTensorInfoTbl[instanceNo];
 
+		const u32 registedNum = targetInfo.mParentTensorCoreTbl.size();
+		targetInfo.mParentTensorCoreTbl.push_back(mTensorInfoTbl[newRootInstanceNo].mTensorCore);
+		std::function<void(std::shared_ptr<TensorCore>, std::vector<std::shared_ptr<TensorCore>>)> oldForwardRule = targetInfo.mForwardRule;
+		
+		auto newFowardRule = [registedNum, oldForwardRule, forwardRule]
+		(std::shared_ptr<TensorCore> target, std::vector<std::shared_ptr<TensorCore>> roots)->void
+		{
+			std::vector<std::shared_ptr<TensorCore> > oldRoots(roots.begin(), roots.begin() + registedNum);
+			std::vector<std::shared_ptr<TensorCore> > newRoots(roots.begin()+registedNum, roots.end());
+			oldForwardRule(target, oldRoots);
+			forwardRule(target, newRoots);
+		};
+
+		targetInfo.mForwardRule = newFowardRule;
+	}
 
 	void forward(u32);
 	void backward(u32);

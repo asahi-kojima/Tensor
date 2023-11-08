@@ -66,7 +66,8 @@ Tensor Tensor::operator + (const Tensor&)&&
 
 Tensor Tensor::operator + (Tensor&& tensorR) const&
 {
-	return Tensor(1);
+	TensorManager::getInstance().registPSForwardInfo(tensorR.mInstanceNo, (*this).mInstanceNo, forwardRule_Add);
+	return tensorR;
 }
 
 Tensor Tensor::operator+(Tensor&&)&&

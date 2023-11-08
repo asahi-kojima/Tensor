@@ -38,7 +38,7 @@ int main()
 	Tensor t6 = t2 + t5;
 
 	Tensor t8 = t6 + Tensor(2, 2, 2);
-	
+	//t8.forward();
 	{
 		Tensor t9 = t2 + t5;
 	}
