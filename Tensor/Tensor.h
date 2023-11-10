@@ -50,8 +50,10 @@ public:
 	Tensor operator+(Tensor&&) const &;
 	Tensor operator+(Tensor&&) &&;
 
-	//Tensor operator*(const Tensor&) const &;
+	Tensor operator*(const Tensor&) const &;
 	//Tensor operator*(const Tensor&) &&;
+
+	Tensor MatMul(const Tensor&, const Tensor&);
 
 	void forward();
 	void backward();

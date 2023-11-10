@@ -17,9 +17,101 @@ namespace
 			target->getComponent(i) += roots[0]->getDeltaComponent(i);
 		}
 	};
+	
+	
+	auto forwardRule_Mul = [](std::shared_ptr<TensorCore> target, std::vector<std::shared_ptr<TensorCore>> roots) -> void
+	{
+		for (u32 i = 0, end = target->getComponentNum(); i < end; i++)
+		{
+			target->getComponent(i) = roots[0]->getComponent(i) * roots[1]->getComponent(i);
+		}
+	};
+	auto backwardRule_Mul = [](std::shared_ptr<TensorCore> target, std::vector<std::shared_ptr<TensorCore>> roots) -> void
+	{
+		for (u32 i = 0, end = target->getComponentNum(); i < end; i++)
+		{
+			target->getComponent(i) += roots[0]->getDeltaComponent(i);
+		}
+	};
+
+
+	auto forwardRule_MatMul = [](std::shared_ptr<TensorCore> target, std::vector<std::shared_ptr<TensorCore>> roots) -> void
+	{
+		for (u32 i = 0, end = target->getComponentNum(); i < end; i++)
+		{
+			target->getComponent(i) = roots[0]->getComponent(i) * roots[1]->getComponent(i);
+		}
+	};
+	auto backwardRule_MatMul = [](std::shared_ptr<TensorCore> target, std::vector<std::shared_ptr<TensorCore>> roots) -> void
+	{
+		for (u32 i = 0, end = target->getComponentNum(); i < end; i++)
+		{
+			target->getComponent(i) += roots[0]->getDeltaComponent(i);
+		}
+	};
 }
 
 Tensor Tensor::operator + (const Tensor& tensorR) const&
+{
+	const Tensor& tensorL = *this;
+
+	assert(tensorL.getComponentNum() == tensorR.getComponentNum());
+
+	Tensor targetTensor(tensorL);
+
+	TensorManager& manager = TensorManager::getInstance();
+
+	//生成したターゲットテンソルへの情報登録
+	u32 rootTensorTbl[2] = { tensorL.mInstanceNo, tensorR.mInstanceNo };
+	u32 rootTensorNum = sizeof(rootTensorTbl) / sizeof(rootTensorTbl[0]);
+	manager.registForwardInfo(targetTensor.mInstanceNo, rootTensorTbl, rootTensorNum, forwardRule_Mul);
+
+
+	//左辺用
+	{
+		u32 childTensorTbl[2] = { targetTensor.mInstanceNo , tensorR.mInstanceNo };
+		u32 childTensorNum = sizeof(childTensorTbl) / sizeof(childTensorTbl[0]);
+		manager.registBackwardInfo(tensorL.mInstanceNo, childTensorTbl, childTensorNum, backwardRule_Mul);
+	}
+
+	//右辺用
+	{
+		u32 childTensorTbl[2] = { targetTensor.mInstanceNo , tensorL.mInstanceNo};
+		u32 childTensorNum = sizeof(childTensorTbl) / sizeof(childTensorTbl[0]);
+		manager.registBackwardInfo(tensorR.mInstanceNo, childTensorTbl, childTensorNum, backwardRule_Mul);
+	}
+
+
+	//グラフの構築
+	TensorManager::getInstance().constructCalculationGraph2(targetTensor.mInstanceNo, tensorL.mInstanceNo, tensorR.mInstanceNo);
+
+	//無くてもいいかも
+	//TensorManager::getInstance().forward(targetTensor.mInstanceNo);
+	
+	return targetTensor;
+}
+
+Tensor Tensor::operator + (const Tensor&)&&
+{
+	return Tensor(1);
+}
+
+
+Tensor Tensor::operator + (Tensor&& tensorR) const&
+{
+	TensorManager::getInstance().registPSForwardInfo(tensorR.mInstanceNo, (*this).mInstanceNo, forwardRule_Add);
+	return tensorR;
+}
+
+Tensor Tensor::operator+(Tensor&&)&&
+{
+	return Tensor(1);
+
+}
+
+
+
+Tensor Tensor::operator * (const Tensor& tensorR) const&
 {
 	const Tensor& tensorL = *this;
 
@@ -55,24 +147,14 @@ Tensor Tensor::operator + (const Tensor& tensorR) const&
 
 	//無くてもいいかも
 	//TensorManager::getInstance().forward(targetTensor.mInstanceNo);
-	
+
 	return targetTensor;
 }
 
-Tensor Tensor::operator + (const Tensor&)&&
-{
-	return Tensor(1);
-}
 
 
-Tensor Tensor::operator + (Tensor&& tensorR) const&
-{
-	TensorManager::getInstance().registPSForwardInfo(tensorR.mInstanceNo, (*this).mInstanceNo, forwardRule_Add);
-	return tensorR;
-}
 
-Tensor Tensor::operator+(Tensor&&)&&
+Tensor Tensor::MatMul(const Tensor& tensorL, const Tensor& tensorR)
 {
-	return Tensor(1);
 
 }

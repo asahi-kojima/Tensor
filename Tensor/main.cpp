@@ -29,7 +29,7 @@ int main()
 	Tensor t0 = Tensor(2, 2, 4); setValue(t0, 1);
 	Tensor t1 = Tensor(2, 2, 4); setValue(t1, 2);
 	Tensor t2 = t0 + t1;
-
+	Tensor ts = t0 * t1;
 
 	Tensor t3 = Tensor(2, 2, 4); setValue(t3, 2);
 	Tensor t4 = Tensor(2, 2, 4); setValue(t4, 3);
